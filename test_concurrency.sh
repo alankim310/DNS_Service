@@ -1,0 +1,1 @@
+seq 100 | xargs -P 10 -I{} sh -c 'dig @127.0.0.1 -p 1053 example.com A'
