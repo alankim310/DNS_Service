@@ -1,3 +1,5 @@
+# Query interface. For question, use questionQuery in DNS_question_query.py
+
 import random
 import struct
 
@@ -21,6 +23,7 @@ class Query:
         header = self.header.buildHeader()
         question = self.question.buildQuestion()
         return header + question
+
 
 # Header Class: takes in flag and counts class object.
 class Header:
@@ -165,8 +168,10 @@ class Question:
 
         for subname in nameLst:
             if not 1 <= len(subname) <= 63:
-                raise ValueError(f"subname should be between 1 and 63 bytes. Subname: {subname} length: {len(subname)}")
-        
+                raise ValueError(
+                    f"subname should be between 1 and 63 bytes. Subname: {subname} length: {len(subname)}"
+                )
+
             lengthByte = bytes([len(subname)])  # how many bytes for each subset of name
             subnameASCII = subname.encode("ascii")  # translate into ASCII
             encodedNameLst.append(lengthByte)
@@ -271,7 +276,6 @@ class Flag:
     def buildingFlag(self):
         print(f"this is the flag {self.flags:b}, bit length: {self.flags.bit_length()}")
         return self.flags
-
 
 
 # contains question count, answer count, authority resource count, additional resource count.
