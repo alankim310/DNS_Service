@@ -3,6 +3,7 @@ import logging
 import configparser
 import struct
 from DNS_question_query import *
+from DNS_parser import *
 
 
 config = configparser.ConfigParser()
@@ -27,12 +28,17 @@ def main():
 
     requestQuery = requestQueryInterface.buildingQuery()
 
-    print(f"questionName: {questionName}, questionType: {questionType}")
-
     clientSocket.sendto(requestQuery, (resolver_IPAddress, int(resolver_serverPort)))
 
     modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
     print(f"From Server: message {modifiedMessage}")
+
+    parsedJSON = DNSParser(modifiedMessage).parsedJson
+
+    print(parsedJSON)
+
+
+
 
     clientSocket.close()
 
