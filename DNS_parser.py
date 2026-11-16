@@ -193,6 +193,7 @@ class TypeParser:
             0x01: "A",
             0x02: "NS",
             0x05: "CNAME",
+            0x06: "SOA",
             0x0C: "PTR",
             0x0F: "MX",
             0x21: "SRV",
@@ -204,6 +205,7 @@ class TypeParser:
 
         int_data = int.from_bytes(self.data, byteorder="big")
         Type = TypeDict.get(int_data, None)
+        print(f"this is type: {int_data:1x} type: {Type}")
         raiseValueError_None(Type, "Type")
         return Type
 
@@ -376,6 +378,47 @@ class ResourceData:
             return NameParser(
                 self.data, self.firstIndex
             ).retrieveDecodedName_and_LastIndex(self.firstIndex)
+
+        elif self.type == "NS":
+            return NameParser(
+                self.data, self.firstIndex
+            ).retrieveDecodedName_and_LastIndex(self.firstIndex)
+
+        elif self.type == "PTR":
+            return NameParser(
+                self.data, self.firstIndex
+            ).retrieveDecodedName_and_LastIndex(self.firstIndex)
+
+        elif self.type == "SOA":
+            names = []
+            index = self.firstIndex
+
+            for _ in range(2):
+                name, lastIndex = NameParser(
+                    self.data, index
+                ).retrieveDecodedName_and_LastIndex(index)
+                index = lastIndex + 1
+
+                names.append(name)
+
+            serial, refresh, retry, expire, minimum = struct.unpack("!5I", self.data[index:index + 20])
+            index = lastIndex + 20
+
+            SOA_dict = {
+                "MNAME": names[0],
+                "RNAME": names[1],
+                "SERIAL": serial,
+                "REFRESH": refresh,
+                "RETRY": retry,
+                "EXPIRE": expire,
+                "MINIMUM": minimum
+            }
+            return (SOA_dict, index - 1)
+
+            
+
+
+
 
         else:
             raise ValueError(f"Unsupported Type. Currently {self.type}")
